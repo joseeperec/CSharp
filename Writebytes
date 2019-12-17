@@ -1,0 +1,21 @@
+private static void writeBits(ref BitStream stream, uint x, uint bits)
+    {
+        byte[] buffer = stream.BytePointer;
+        uint bit = stream.BitPosition;
+        uint mask = (uint)(1 << (int)(bits - 1));
+
+        for (uint count = 0; count < bits; ++count)
+        {
+            buffer[stream.Index] = (byte)((buffer[stream.Index] & (0xff ^ (1 << (int)(7 - bit)))) + ((Convert.ToBoolean(x & mask) ? 1 : 0) << (int)(7 - bit)));
+            x <<= 1;
+            bit = (bit + 1) & 7;
+
+            if (!Convert.ToBoolean(bit))
+            {
+                ++stream.Index;
+            }
+        }
+
+        stream.BytePointer = buffer;
+        stream.BitPosition = bit;
+    }
